@@ -508,6 +508,7 @@
     }
 
     .empty-state {
+      width: 100%;
       margin-top: 40px;
       font-size: 13px;
       color: var(--text-soft);
@@ -1012,11 +1013,6 @@
     <!-- Sidebar with inputs -->
     <aside class="sidebar">
       <div class="sidebar-scroll">
-        <div class="section-label">Inputs</div>
-        <div class="sidebar-heading">
-          Describe the brand and how you want it to feel. The colours will follow.
-        </div>
-
         <!-- Accordion: Brand Strategy -->
         <section class="accordion" id="accordion-strategy">
           <div class="accordion-header" data-accordion-toggle>
@@ -1031,7 +1027,7 @@
                   <span class="field-hint">Up to 3 chips</span>
                 </div>
                 <div class="chip-input" data-chip-input data-max="3">
-                  <input type="text" placeholder="Warm, inventive, grounded…" aria-label="Brand attributes" />
+                  <input type="text" placeholder="e.g. playful, bold, grounded" aria-label="Brand attributes" />
                 </div>
                 <div class="chip-counter" data-chip-counter>0 / 3</div>
               </div>
@@ -1055,7 +1051,7 @@
                   <span class="field-hint">Up to 5 chips</span>
                 </div>
                 <div class="chip-input" data-chip-input data-max="5">
-                  <input type="text" placeholder="Design leaders, indie founders…" aria-label="Target audience" />
+                  <input type="text" placeholder="Gen Z students, Mindfulness practitioners…" aria-label="Target audience" />
                 </div>
                 <div class="chip-counter" data-chip-counter>0 / 5</div>
               </div>
@@ -1082,7 +1078,7 @@
                   id="story"
                   class="input-base"
                   rows="3"
-                  placeholder="A few sentences about why this brand exists, what it stands for, and how it should feel."
+                  placeholder="A few sentences about the brand's origin, who it's for, and the role it plays in their story."
                 ></textarea>
               </div>
             </div>
