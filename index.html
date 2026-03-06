@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Brand Palette Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      /* Core colours */
+      --bg-app: #ffffff;
+      --bg-elevated: #ffffff;
+      --bg-elevated-soft: #ffffff;
+      --accent: #348bfd;
+      --accent-soft: #e5f0ff;
+      --accent-strong: #1254b5;
+      --border-subtle: #e0e0e8;
+      --border-strong: #c0c6d9;
+      --text-main: #101827;
+      --text-muted: #4b5563;
+      --text-soft: #6b7280;
+      --chip-bg: #e5f0ff;
+      --chip-border: #c0d4ff;
+      --danger: #b00020;
+
+      /* Layout */
+      --sidebar-width: 380px;
+      --topbar-height: 56px;
+
+      /* Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --radius-pill: 999px;
+
+      /* Spacing */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-7: 32px;
+
+      /* Shadows */
+      --shadow-soft: 0 18px 38px rgba(161, 96, 104, 0.18);
+      --shadow-subtle: 0 10px 28px rgba(161, 96, 104, 0.12);
+
+      /* Animation */
+      --transition-fast: 150ms ease-out;
+      --transition-med: 220ms ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-app);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    textarea {
+      font-family: inherit;
+    }
+
+    /* Top bar */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-6);
+      border-bottom: 1px solid #e0e0e8;
+      backdrop-filter: blur(18px);
+      background: #ffffff;
+      z-index: 10;
+    }
+
+    .topbar-title {
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .topbar-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-right: var(--space-2);
+    }
+
+    /* Layout */
+    .app-shell {
+      display: flex;
+      margin-top: var(--topbar-height);
+      height: calc(100vh - var(--topbar-height));
+    }
+
+    .sidebar {
+      position: fixed;
+      top: var(--topbar-height);
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #e0e0e8;
+      background: #f8f8f8;
+      box-shadow: 18px 0 48px rgba(170, 115, 122, 0.10);
+      z-index: 5;
+    }
+
+    .sidebar-scroll {
+      flex: 1;
+      overflow: auto;
+      padding: var(--space-5) var(--space-6) var(--space-4);
+    }
+
+    .sidebar-footer {
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid #e0e0e8;
+      background: #f8f8f8;
+    }
+
+    .main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: var(--space-6) var(--space-7);
+      overflow: auto;
+    }
+
+    /* Inputs and form UI */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-soft);
+      margin-bottom: var(--space-2);
+    }
+
+    .sidebar-heading {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    .field {
+      margin-bottom: var(--space-4);
+    }
+
+    .field-label-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: var(--space-1);
+    }
+
+    .field-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .input-base {
+      width: 100%;
+      border-radius: var(--radius-md);
+      border: 1px solid #e0e0e8;
+      padding: 8px 10px;
+      font-size: 13px;
+      background: #ffffff;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color var(--transition-med), box-shadow var(--transition-med), background var(--transition-med), transform 120ms ease-out;
+    }
+
+    .input-base:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(52, 139, 253, 0.35), 0 6px 18px rgba(15, 106, 223, 0.20);
+      background: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    textarea.input-base {
+      resize: none;
+      min-height: 60px;
+    }
+
+    /* Tag/chip input */
+    .chip-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid #e0e0e8;
+      background: #ffffff;
+      cursor: text;
+      transition: border-color var(--transition-med), box-shadow var(--transition-med), background var(--transition-med);
+    }
+
+    .chip-input.focused {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(52, 139, 253, 0.35), 0 6px 18px rgba(15, 106, 223, 0.20);
+      background: #ffffff;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 9px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--chip-border);
+      background: var(--chip-bg);
+      font-size: 11px;
+      color: var(--text-main);
+      box-shadow: 0 6px 16px rgba(192, 110, 122, 0.18);
+    }
+
+    .chip-remove {
+      border: none;
+      background: none;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 0 0 2px;
+      cursor: pointer;
+      color: rgba(117, 66, 74, 0.9);
+    }
+
+    .chip-input input {
+      border: none;
+      outline: none;
+      padding: 3px 4px;
+      min-width: 60px;
+      flex: 1;
+      font-size: 13px;
+      background: transparent;
+      color: var(--text-main);
+    }
+
+    .chip-counter {
+      font-size: 10px;
+      color: var(--text-soft);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* Accordion */
+    .accordion {
+      border-radius: var(--radius-lg);
+      background: #ffffff;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid #e0e0e8;
+      overflow: hidden;
+      margin-bottom: var(--space-5);
+    }
+
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      cursor: pointer;
+      background: #f8f8f8;
+    }
+
+    .accordion-title {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    .accordion-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--text-soft);
+      background: #ffffff;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+      transition: transform var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .accordion-header[aria-expanded="true"] .accordion-icon {
+      transform: rotate(90deg);
+      background: var(--accent-soft);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+    }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 260ms ease-out, opacity 220ms ease-out;
+      opacity: 0;
+    }
+
+    .accordion-body-inner {
+      padding: 10px 14px 12px;
+      border-top: 1px solid #e0e0e8;
+      background: #ffffff;
+    }
+
+    .accordion-body.open {
+      opacity: 1;
+    }
+
+    /* Segmented control */
+    .segmented {
+      display: inline-flex;
+      border-radius: var(--radius-pill);
+      background: #f3f4f6;
+      padding: 3px;
+      border: 1px solid #e0e0e8;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.10);
+    }
+
+    .segment-button {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition-med), color var(--transition-med), box-shadow var(--transition-med), transform 120ms ease-out;
+    }
+
+    .segment-pill {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid #93c5fd;
+      background: #dbeafe;
+    }
+
+    .segment-button.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(15, 106, 223, 0.35);
+      transform: translateY(-1px);
+    }
+
+    /* Combination grid */
+    .combo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: var(--space-3);
+    }
+
+    .combo-card {
+      border-radius: var(--radius-md);
+      border: 1px solid #e0e0e8;
+      background: #ffffff;
+      padding: 10px 10px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 8px 22px rgba(161, 107, 119, 0.20);
+      transition: border-color var(--transition-med), box-shadow var(--transition-med), transform 150ms ease-out, background 200ms ease-out;
+    }
+
+    .combo-card:hover {
+      transform: translateY(-2px) translateZ(0);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    }
+
+    .combo-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 12px 30px rgba(15, 106, 223, 0.35);
+      background: #e5f0ff;
+    }
+
+    .combo-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 4px 0 2px;
+    }
+
+    .combo-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(140, 74, 85, 0.7);
+    }
+
+    .combo-name {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-main);
+    }
+
+    /* Colour count buttons */
+    .count-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .count-button {
+      flex: 1;
+      border-radius: var(--radius-pill);
+      border: 1px solid #e0e0e8;
+      background: #ffffff;
+      padding: 6px 0;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text-soft);
+      transition: background var(--transition-med), color var(--transition-med), box-shadow var(--transition-med), transform 140ms ease-out;
+      box-shadow: 0 8px 20px rgba(164, 113, 122, 0.20);
+    }
+
+    .count-button.active {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(15, 106, 223, 0.35);
+      transform: translateY(-1px);
+    }
+
+    /* Generate button */
+    .generate-button {
+      width: 100%;
+      border-radius: var(--radius-pill);
+      border: none;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      color: #ffffff;
+      background: var(--accent);
+      box-shadow: 0 12px 30px rgba(15, 106, 223, 0.40);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 120ms ease-out, box-shadow 160ms ease-out, filter 150ms ease-out;
+    }
+
+    .generate-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(15, 106, 223, 0.55);
+      filter: brightness(1.02);
+    }
+
+    .generate-button:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 8px 20px rgba(15, 106, 223, 0.45);
+      filter: brightness(0.98);
+    }
+
+    .generate-icon {
+      font-size: 14px;
+      transform: translateY(0.5px);
+    }
+
+    .generate-shortcut {
+      font-size: 11px;
+      opacity: 0.8;
+    }
+
+    /* Main output area */
+    .main-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .empty-state {
+      margin-top: 40px;
+      font-size: 13px;
+      color: var(--text-soft);
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      border: 1px dashed #e0e0e8;
+      padding: 18px 18px 18px 16px;
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .empty-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 4px;
+      background: #348bfd;
+      box-shadow: 0 8px 18px rgba(15, 106, 223, 0.35);
+    }
+
+    .empty-text-strong {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-main);
+    }
+
+    .empty-text-muted {
+      margin-top: 6px;
+    }
+
+    .output-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+      margin-top: 6px;
+    }
+
+    .output-title {
+      font-size: 24px;
+      letter-spacing: 0.02em;
+      color: var(--text-main);
+    }
+
+    .output-subtitle {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .badges {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .badge {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 4px 7px;
+      border-radius: 999px;
+      border: 1px solid #e0e0e8;
+      background: #f3f4f6;
+      color: var(--text-soft);
+    }
+
+    /* Territory callout */
+    .territory-callout {
+      border-radius: var(--radius-lg);
+      background: #ffffff;
+      border: 1px solid #e0e0e8;
+      padding: 12px 16px;
+      margin-bottom: var(--space-5);
+      display: flex;
+      gap: 12px;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .territory-accent {
+      width: 3px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: none;
+    }
+
+    .territory-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .territory-text {
+      font-size: 13px;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    /* Swatches */
+    .swatch-row {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 18px;
+      overflow-x: auto;
+      padding-bottom: var(--space-3);
+      margin-bottom: var(--space-5);
+      scroll-snap-type: x mandatory;
+    }
+
+    .swatch-card {
+      scroll-snap-align: start;
+      min-width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      animation: fadeUp 380ms ease-out both;
+    }
+
+    .swatch-rect {
+      height: 160px;
+      border-radius: 32px;
+      border: 1px solid rgba(112, 68, 77, 0.38);
+      box-shadow: 0 20px 40px rgba(90, 52, 60, 0.55);
+      background-size: 160% 160%;
+      background-position: center;
+      transition: transform 160ms ease-out, box-shadow 180ms ease-out;
+    }
+
+    .swatch-card:hover .swatch-rect {
+      transform: translateY(-4px);
+      box-shadow: 0 26px 56px rgba(80, 45, 55, 0.75);
+    }
+
+    .swatch-meta {
+      text-align: left;
+    }
+
+    .swatch-name {
+      font-size: 14px;
+      letter-spacing: 0.02em;
+      color: var(--text-main);
+    }
+
+    .swatch-hex-role {
+      font-size: 11px;
+      color: var(--text-soft);
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2px;
+      gap: 8px;
+    }
+
+    .swatch-tag {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #e0e0e8;
+      background: #f3f4f6;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
+      white-space: nowrap;
+    }
+
+    /* Usage ratio strip */
+    .usage-strip {
+      border-radius: 999px;
+      overflow: hidden;
+      display: flex;
+      height: 18px;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.20);
+      margin-bottom: var(--space-1);
+    }
+
+    .usage-segment {
+      height: 100%;
+      transition: flex 320ms ease-out;
+    }
+
+    .usage-caption-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: var(--space-5);
+      gap: 12px;
+    }
+
+    .usage-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-soft);
+    }
+
+    .usage-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .usage-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #e0e0e8;
+      background: #f3f4f6;
+      color: var(--text-soft);
+    }
+
+    .usage-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Preview card */
+    .preview-wrapper {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .preview-card {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 48px rgba(15, 23, 42, 0.35);
+      border: 1px solid #e0e0e8;
+      transform: translateZ(0);
+      background: #ffffff;
+    }
+
+    .preview-inner {
+      padding: 16px 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .preview-toprow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .preview-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .preview-pill {
+      padding: 4px 8px;
+      font-size: 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+    }
+
+    .preview-body {
+      border-radius: 16px;
+      padding: 12px 12px 14px;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .preview-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .preview-line {
+      height: 7px;
+      border-radius: 999px;
+      opacity: 0.9;
+    }
+
+    .preview-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      gap: 10px;
+    }
+
+    .preview-avatars {
+      display: flex;
+      gap: -6px;
+    }
+
+    .preview-avatar {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 2px solid #ffffff;
+    }
+
+    .preview-button {
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: none;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: default;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .preview-metadata {
+      border-radius: 20px;
+      border: 1px solid #e0e0e8;
+      padding: 12px 14px;
+      background: #ffffff;
+      font-size: 11px;
+      color: var(--text-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .preview-metadata-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .preview-metadata-label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+    }
+
+    /* Skeleton / shimmer */
+    .skeleton {
+      position: relative;
+      overflow: hidden;
+      background-color: #f3f4f6;
+      animation: shimmer 1300ms ease-in-out infinite;
+      border-radius: inherit;
+    }
+
+    .skeleton-block {
+      border-radius: 999px;
+      height: 12px;
+      margin-bottom: 8px;
+    }
+
+    .loading-state {
+      display: none;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    .loading-state.active {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .loading-territory {
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      background: #ffffff;
+      border: 1px solid #e0e0e8;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%) translateY(20px);
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.96);
+      color: #f9fafb;
+      font-size: 11px;
+      box-shadow: 0 18px 40px rgba(42, 16, 23, 0.85);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms ease-out, transform 160ms ease-out;
+      z-index: 20;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast-strong {
+      font-weight: 500;
+    }
+
+    /* Error message */
+    .error-banner {
+      margin: 14px 0 8px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid #f97373;
+      background: #fef2f2;
+      color: #7f1d1d;
+      font-size: 11px;
+      display: none;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .error-dot {
+      width: 8px;
+      height: 8px;
+      margin-top: 4px;
+      border-radius: 999px;
+      background: #f97373;
+      box-shadow: 0 6px 14px rgba(127, 29, 29, 0.65);
+    }
+
+    .error-banner.visible {
+      display: flex;
+    }
+
+    /* Animations */
+    @keyframes shimmer {
+      0% {
+        background-position: -120% 0;
+      }
+      100% {
+        background-position: 120% 0;
+      }
+    }
+
+    @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      :root {
+        --sidebar-width: 320px;
+      }
+      .preview-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .loading-state.active {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 780px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        max-height: unset;
+        box-shadow: none;
+        border-right: none;
+        border-bottom: 1px solid rgba(211, 160, 167, 0.55);
+      }
+      .app-shell {
+        flex-direction: column;
+        height: auto;
+      }
+      .main {
+        margin-left: 0;
+        padding: var(--space-4) var(--space-4) var(--space-6);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-dot"></div>
+  </div>
+
+  <div class="app-shell">
+    <!-- Sidebar with inputs -->
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+        <div class="section-label">Inputs</div>
+        <div class="sidebar-heading">
+          Describe the brand and how you want it to feel. The colours will follow.
+        </div>
+
+        <!-- Accordion: Brand Strategy -->
+        <section class="accordion" id="accordion-strategy">
+          <div class="accordion-header" data-accordion-toggle>
+            <div class="accordion-title">Brand Strategy</div>
+            <div class="accordion-icon" aria-hidden="true">›</div>
+          </div>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <div class="field">
+                <div class="field-label-row">
+                  <label class="field-label">Brand attributes</label>
+                  <span class="field-hint">Up to 3 chips</span>
+                </div>
+                <div class="chip-input" data-chip-input data-max="3">
+                  <input type="text" placeholder="Warm, inventive, grounded…" aria-label="Brand attributes" />
+                </div>
+                <div class="chip-counter" data-chip-counter>0 / 3</div>
+              </div>
+
+              <div class="field">
+                <div class="field-label-row">
+                  <label for="personality" class="field-label">Brand personality</label>
+                  <span class="field-hint">Single line</span>
+                </div>
+                <input
+                  id="personality"
+                  type="text"
+                  class="input-base"
+                  placeholder="e.g. Confident but kind, with a sense of craft"
+                />
+              </div>
+
+              <div class="field">
+                <div class="field-label-row">
+                  <label class="field-label">Target audience</label>
+                  <span class="field-hint">Up to 5 chips</span>
+                </div>
+                <div class="chip-input" data-chip-input data-max="5">
+                  <input type="text" placeholder="Design leaders, indie founders…" aria-label="Target audience" />
+                </div>
+                <div class="chip-counter" data-chip-counter>0 / 5</div>
+              </div>
+
+              <div class="field">
+                <div class="field-label-row">
+                  <label for="positioning" class="field-label">Positioning</label>
+                  <span class="field-hint">2–3 words or a short line</span>
+                </div>
+                <textarea
+                  id="positioning"
+                  class="input-base"
+                  rows="2"
+                  placeholder="e.g. Premium yet approachable creative partner for modern brands."
+                ></textarea>
+              </div>
+
+              <div class="field">
+                <div class="field-label-row">
+                  <label for="story" class="field-label">Brand story</label>
+                  <span class="field-hint">(Optional)</span>
+                </div>
+                <textarea
+                  id="story"
+                  class="input-base"
+                  rows="3"
+                  placeholder="A few sentences about why this brand exists, what it stands for, and how it should feel."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Accordion: Visual Ingredients -->
+        <section class="accordion" id="accordion-visual">
+          <div class="accordion-header" data-accordion-toggle>
+            <div class="accordion-title">Visual Ingredients</div>
+            <div class="accordion-icon" aria-hidden="true">›</div>
+          </div>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              <!-- Style segmented control -->
+              <div class="field">
+                <div class="field-label-row">
+                  <label class="field-label">Style bias</label>
+                </div>
+                <div class="segmented" id="style-toggle">
+                  <button class="segment-button active" data-style="soft_muted" type="button">
+                    <span class="segment-pill"></span>
+                    Soft &amp; Muted
+                  </button>
+                  <button class="segment-button" data-style="loud_bright" type="button">
+                    <span class="segment-pill"></span>
+                    Loud &amp; Bright
+                  </button>
+                </div>
+              </div>
+
+              <!-- Combination type grid -->
+              <div class="field">
+                <div class="field-label-row">
+                  <label class="field-label">Colour combination type</label>
+                  <span class="field-hint">Pick one</span>
+                </div>
+                <div class="combo-grid" id="combo-grid">
+                  <div class="combo-card active" data-combo="analogous">
+                    <div class="combo-diagram">
+                      <div class="combo-dot" style="background:#f97583;"></div>
+                      <div class="combo-dot" style="background:#fbbf92;"></div>
+                      <div class="combo-dot" style="background:#f5df9b;"></div>
+                    </div>
+                    <div class="combo-name">Analogous</div>
+                  </div>
+                  <div class="combo-card" data-combo="triadic">
+                    <div class="combo-diagram">
+                      <div class="combo-dot" style="background:#f97373;"></div>
+                      <div class="combo-dot" style="background:#6ec1ff;"></div>
+                      <div class="combo-dot" style="background:#fac863;"></div>
+                    </div>
+                    <div class="combo-name">Triadic</div>
+                  </div>
+                  <div class="combo-card" data-combo="monochromatic">
+                    <div class="combo-diagram">
+                      <div class="combo-dot" style="background:#f1a9b6;"></div>
+                      <div class="combo-dot" style="background:#e26a80;"></div>
+                      <div class="combo-dot" style="background:#c93c59;"></div>
+                    </div>
+                    <div class="combo-name">Monochromatic</div>
+                  </div>
+                  <div class="combo-card" data-combo="complementary">
+                    <div class="combo-diagram">
+                      <div class="combo-dot" style="background:#f87171;"></div>
+                      <div class="combo-dot" style="background:#3b82f6;"></div>
+                      <div class="combo-dot" style="background:#fbbf24;"></div>
+                    </div>
+                    <div class="combo-name">Complementary</div>
+                  </div>
+                  <div class="combo-card" data-combo="dynamic">
+                    <div class="combo-diagram">
+                      <div class="combo-dot" style="background:#ec4899;"></div>
+                      <div class="combo-dot" style="background:#22c55e;"></div>
+                      <div class="combo-dot" style="background:#f97316;"></div>
+                    </div>
+                    <div class="combo-name">Dynamic</div>
+                  </div>
+                  <div class="combo-card" data-combo="monocolor">
+                    <div class="combo-diagram">
+                      <div class="combo-dot" style="background:#475569;"></div>
+                      <div class="combo-dot" style="background:#64748b;"></div>
+                      <div class="combo-dot" style="background:#cbd5f5;"></div>
+                    </div>
+                    <div class="combo-name">Monocolor</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Number of colours -->
+              <div class="field">
+                <div class="field-label-row">
+                  <label class="field-label">Number of colours</label>
+                  <span class="field-hint">System size</span>
+                </div>
+                <div class="count-row" id="count-row">
+                  <button class="count-button" data-count="4" type="button">4</button>
+                  <button class="count-button active" data-count="5" type="button">5</button>
+                  <button class="count-button" data-count="6" type="button">6</button>
+                  <button class="count-button" data-count="7" type="button">7</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Sidebar footer -->
+      <div class="sidebar-footer">
+        <button id="generate-btn" class="generate-button" type="button">
+          <span>Generate palette</span>
+          <span class="generate-icon">→</span>
+          <span class="generate-shortcut">⌘⏎ from any textarea</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main output area -->
+    <main class="main">
+      <div class="main-inner">
+        <div class="output-header">
+          <div>
+            <div class="output-title" id="palette-title">No palette yet</div>
+            <div class="output-subtitle" id="palette-description">
+              Tell me about the brand on the left, then generate a system-ready palette.
+            </div>
+          </div>
+          <div class="badges" id="output-badges">
+            <span class="badge">Waiting for inputs</span>
+          </div>
+        </div>
+
+        <div id="error-banner" class="error-banner" role="alert">
+          <div class="error-dot"></div>
+          <div>
+            <div style="font-weight:500; margin-bottom:2px;">Something went wrong while talking to the colour engine.</div>
+            <div>Please try again in a moment. If the problem persists, check your Anthropic API setup.</div>
+          </div>
+        </div>
+
+        <!-- Initial empty state -->
+        <div id="empty-state" class="empty-state">
+          <div class="empty-dot"></div>
+          <div>
+            <div class="empty-text-strong">Working palettes start with clear intent.</div>
+            <div class="empty-text-muted">
+              Add a few attributes, who this is for, and whether you want a soft or loud system. I’ll generate a hierarchy with anchors, neutrals, brand colours, and accents.
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading / skeleton state -->
+        <div id="loading-state" class="loading-state">
+          <div>
+            <div class="loading-territory">
+              <div class="skeleton-block skeleton" style="width:36%; height:10px; margin-bottom:6px;"></div>
+              <div class="skeleton-block skeleton" style="width:100%;"></div>
+              <div class="skeleton-block skeleton" style="width:92%;"></div>
+              <div class="skeleton-block skeleton" style="width:65%; margin-bottom:0;"></div>
+            </div>
+            <div style="margin-top:14px;">
+              <div class="skeleton usage-strip"></div>
+            </div>
+          </div>
+          <div class="preview-card skeleton">
+            <div class="preview-inner">
+              <div class="skeleton-block" style="width:48%;"></div>
+              <div class="skeleton-block" style="width:72%;"></div>
+              <div class="skeleton-block" style="width:40%; margin-bottom:0;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generated content -->
+        <div id="results-container" style="display:none;">
+          <section id="territory-section" class="territory-callout">
+            <div class="territory-accent"></div>
+            <div>
+              <div class="territory-label">Brand territory</div>
+              <div id="territory-text" class="territory-text"></div>
+            </div>
+          </section>
+
+          <section id="swatches-section">
+            <div class="swatch-row" id="swatch-row"></div>
+          </section>
+
+          <section id="usage-section">
+            <div class="usage-strip" id="usage-strip"></div>
+            <div class="usage-caption-row">
+              <div class="usage-label">Usage ratio</div>
+              <div id="usage-legend" class="usage-legend"></div>
+            </div>
+          </section>
+
+          <section id="preview-section" style="margin-top:10px;">
+            <div class="preview-wrapper">
+              <article class="preview-card">
+                <div id="preview-background" class="preview-inner">
+                  <div class="preview-toprow">
+                    <div class="preview-title" id="preview-title">Brand UI preview</div>
+                    <div class="preview-pill" id="preview-pill">Primary action</div>
+                  </div>
+                  <div class="preview-body">
+                    <div class="preview-lines">
+                      <div class="preview-line" id="preview-line-strong"></div>
+                      <div class="preview-line" id="preview-line-subtle-1"></div>
+                      <div class="preview-line" id="preview-line-subtle-2" style="width:65%;"></div>
+                    </div>
+                    <div class="preview-footer-row">
+                      <div class="preview-avatars" id="preview-avatars">
+                        <div class="preview-avatar"></div>
+                        <div class="preview-avatar"></div>
+                        <div class="preview-avatar"></div>
+                      </div>
+                      <button class="preview-button" id="preview-button" type="button">
+                        Try it now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+
+              <aside class="preview-metadata" id="preview-meta">
+                <div class="preview-metadata-row">
+                  <div class="preview-metadata-label">Hierarchy</div>
+                  <div id="meta-hierarchy"></div>
+                </div>
+                <div class="preview-metadata-row">
+                  <div class="preview-metadata-label">Roles</div>
+                  <div id="meta-roles"></div>
+                </div>
+                <div class="preview-metadata-row">
+                  <div class="preview-metadata-label">Contrast</div>
+                  <div id="meta-contrast"></div>
+                </div>
+              </aside>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <span class="toast-strong">Hex copied.</span>&nbsp;Paste it anywhere in your system.
+  </div>
+
+  <script>
+    // ----- Utility: safe DOM helpers -----
+    function $(selector, root = document) {
+      return root.querySelector(selector);
+    }
+    function $all(selector, root = document) {
+      return Array.from(root.querySelectorAll(selector));
+    }
+
+    // ----- Accordion behaviour -----
+    function setupAccordions() {
+      $all("[data-accordion-toggle]").forEach((header) => {
+        const accordion = header.closest(".accordion");
+        const body = accordion.querySelector(".accordion-body");
+        const bodyInner = accordion.querySelector(".accordion-body-inner");
+
+        // Start with Brand Strategy open, Visual Ingredients open by default
+        const openInitially = accordion.id === "accordion-strategy" || accordion.id === "accordion-visual";
+        if (openInitially) {
+          body.style.maxHeight = bodyInner.offsetHeight + "px";
+          body.classList.add("open");
+          header.setAttribute("aria-expanded", "true");
+        } else {
+          header.setAttribute("aria-expanded", "false");
+        }
+
+        header.addEventListener("click", () => {
+          const isOpen = body.classList.contains("open");
+          if (isOpen) {
+            body.style.maxHeight = "0px";
+            body.classList.remove("open");
+            header.setAttribute("aria-expanded", "false");
+          } else {
+            body.style.maxHeight = bodyInner.offsetHeight + "px";
+            body.classList.add("open");
+            header.setAttribute("aria-expanded", "true");
+          }
+        });
+      });
+    }
+
+    // ----- Chip / tag inputs -----
+    function setupChipInputs() {
+      $all("[data-chip-input]").forEach((container) => {
+        const input = $("input", container);
+        const max = parseInt(container.dataset.max, 10) || Infinity;
+        const counter = container.parentElement.querySelector("[data-chip-counter]");
+
+        function updateCounter() {
+          const count = container.querySelectorAll(".chip").length;
+          if (counter) {
+            counter.textContent = count + " / " + max;
+          }
+        }
+
+        function createChip(label) {
+          const trimmed = label.trim();
+          if (!trimmed) return;
+          const existing = Array.from(container.querySelectorAll(".chip-label")).map((el) =>
+            el.textContent.toLowerCase()
+          );
+          if (existing.includes(trimmed.toLowerCase())) return;
+
+          const count = container.querySelectorAll(".chip").length;
+          if (count >= max) return;
+
+          const chip = document.createElement("span");
+          chip.className = "chip";
+
+          const span = document.createElement("span");
+          span.className = "chip-label";
+          span.textContent = trimmed;
+
+          const btn = document.createElement("button");
+          btn.className = "chip-remove";
+          btn.type = "button";
+          btn.innerHTML = "×";
+          btn.addEventListener("click", () => {
+            chip.remove();
+            updateCounter();
+          });
+
+          chip.appendChild(span);
+          chip.appendChild(btn);
+
+          container.insertBefore(chip, input);
+          updateCounter();
+        }
+
+        container.addEventListener("click", () => {
+          input.focus();
+        });
+
+        input.addEventListener("focus", () => {
+          container.classList.add("focused");
+        });
+
+        input.addEventListener("blur", () => {
+          container.classList.remove("focused");
+        });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input.value.trim()) {
+              createChip(input.value);
+              input.value = "";
+            }
+          } else if (e.key === "Backspace" && !input.value) {
+            const chips = container.querySelectorAll(".chip");
+            const last = chips[chips.length - 1];
+            if (last) {
+              last.remove();
+              updateCounter();
+            }
+          }
+        });
+
+        updateCounter();
+      });
+    }
+
+    function readChipValues(container) {
+      return $all(".chip-label", container).map((el) => el.textContent.trim());
+    }
+
+    // ----- Segmented control -----
+    function setupStyleToggle() {
+      const container = $("#style-toggle");
+      if (!container) return;
+
+      $all(".segment-button", container).forEach((btn) => {
+        btn.addEventListener("click", () => {
+          $all(".segment-button", container).forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+        });
+      });
+    }
+
+    function getSelectedStyle() {
+      const active = $("#style-toggle .segment-button.active");
+      return active ? active.dataset.style : "soft_muted";
+    }
+
+    // ----- Combination cards -----
+    function setupComboGrid() {
+      const grid = $("#combo-grid");
+      if (!grid) return;
+
+      $all(".combo-card", grid).forEach((card) => {
+        card.addEventListener("click", () => {
+          $all(".combo-card", grid).forEach((c) => c.classList.remove("active"));
+          card.classList.add("active");
+        });
+      });
+    }
+
+    function getSelectedCombo() {
+      const active = $("#combo-grid .combo-card.active");
+      return active ? active.dataset.combo : "analogous";
+    }
+
+    // ----- Colour count buttons -----
+    function setupCountButtons() {
+      const row = $("#count-row");
+      if (!row) return;
+
+      $all(".count-button", row).forEach((btn) => {
+        btn.addEventListener("click", () => {
+          $all(".count-button", row).forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+        });
+      });
+    }
+
+    function getSelectedCount() {
+      const active = $("#count-row .count-button.active");
+      return active ? parseInt(active.dataset.count, 10) || 5 : 5;
+    }
+
+    // ----- Loading / error / toast -----
+    function setLoading(isLoading) {
+      const loading = $("#loading-state");
+      const results = $("#results-container");
+      const empty = $("#empty-state");
+      const button = $("#generate-btn");
+
+      if (isLoading) {
+        loading.classList.add("active");
+        empty.style.display = "none";
+        button.disabled = true;
+        button.style.opacity = "0.82";
+      } else {
+        loading.classList.remove("active");
+        button.disabled = false;
+        button.style.opacity = "1";
+      }
+
+      if (!isLoading && results.dataset.hasResult === "true") {
+        results.style.display = "";
+      }
+    }
+
+    function showError(message) {
+      const banner = $("#error-banner");
+      if (!banner) return;
+      banner.classList.add("visible");
+      if (message) {
+        banner.querySelector("div:nth-child(2)").lastElementChild.textContent = message;
+      }
+    }
+
+    function clearError() {
+      const banner = $("#error-banner");
+      if (!banner) return;
+      banner.classList.remove("visible");
+    }
+
+    let toastTimeout = null;
+    function showToast(text) {
+      const toast = $("#toast");
+      if (!toast) return;
+      if (text) {
+        toast.innerHTML =
+          '<span class="toast-strong">Hex copied.</span>&nbsp;' + text;
+      }
+      toast.classList.add("show");
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1900);
+    }
+
+    // ----- Anthropic API integration -----
+    async function callAnthropic(promptPayload) {
+      const body = {
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [
+          {
+            role: "system",
+            content: [
+              {
+                type: "text",
+                text:
+                  "You are a brand and colour systems designer. " +
+                  "You design small but robust UI colour systems that are ready for product and interface work, " +
+                  "not just mood boards. Always respond with strictly valid JSON only, no markdown or prose outside of JSON."
+              }
+            ]
+          },
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: buildPrompt(promptPayload)
+              }
+            ]
+          }
+        ]
+      };
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Anthropic-Version": "2023-06-01"
+          // NOTE: Authentication is handled externally; no API key is included here.
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        throw new Error("Anthropic API error: " + response.status);
+      }
+
+      const data = await response.json();
+      const textContent =
+        data &&
+        Array.isArray(data.content) &&
+        data.content.length > 0 &&
+        data.content[0].type === "text"
+          ? data.content[0].text
+          : null;
+
+      if (!textContent) {
+        throw new Error("Unexpected response structure from Anthropic.");
+      }
+
+      let json;
+      try {
+        json = JSON.parse(textContent);
+      } catch (err) {
+        throw new Error("Failed to parse JSON from Anthropic. Ensure the assistant returns pure JSON.");
+      }
+
+      return json;
+    }
+
+    // Build the two-step prompt: territory reasoning, then palette
+    function buildPrompt(payload) {
+      const {
+        attributes,
+        personality,
+        audience,
+        positioning,
+        story,
+        styleBias,
+        comboType,
+        colorCount
+      } = payload;
+
+      return (
+        "You are designing a compact but complete UI colour system for a digital brand.\n\n" +
+        "Step 1 — Brand territory:\n" +
+        "Analyse the following inputs and identify the emotional and visual territory of the brand. " +
+        "Summarise it in 1–2 sentences.\n\n" +
+        "Brand attributes (chips): " +
+        JSON.stringify(attributes) +
+        "\n" +
+        "Brand personality (single line): " +
+        (personality || "") +
+        "\n" +
+        "Target audience (chips): " +
+        JSON.stringify(audience) +
+        "\n" +
+        "Positioning (short textarea): " +
+        (positioning || "") +
+        "\n" +
+        "Brand story (optional longer textarea): " +
+        (story || "") +
+        "\n\n" +
+        "Step 2 — Palette generation:\n" +
+        "Using that territory, generate a " +
+        colorCount +
+        "-colour palette that strictly follows:\n" +
+        "- Style bias: " +
+        (styleBias === "soft_muted" ? "SOFT & MUTED" : "LOUD & BRIGHT") +
+        "\n" +
+        "- Colour combination type: " +
+        comboType.toUpperCase() +
+        " (use this as the underlying hue relationship).\n\n" +
+        "This palette must work as a UI system with a clear hierarchy, not as a mood board. " +
+        "The palette MUST always include:\n" +
+        "- At least one darker anchor colour with real visual weight (for text, depth, or dense surfaces).\n" +
+        "- At least one light neutral for surfaces/backgrounds and breathing room.\n" +
+        "- One or two mid‑tone brand colours that carry the personality of the palette.\n" +
+        "- One accent or support colour for CTAs, highlights, and interactions, which contrasts strongly against the background and is legible for text on the button.\n\n" +
+        "Avoid palettes where all colours live at a similar brightness or saturation level. " +
+        "Ensure that from the palette alone, a designer can immediately tell which colour is primarily used for backgrounds/surfaces, which is for body text/headlines, and which is the main action colour.\n\n" +
+        "Return your answer as STRICT, VALID JSON only (no markdown, no commentary) with the following structure:\n" +
+        "{\n" +
+        '  \"palette_name\": string,\n' +
+        '  \"palette_description\": string,\n' +
+        '  \"brand_territory\": string, // 1–2 sentence explanation based on Step 1\n' +
+        '  \"style_bias\": \"soft_muted\" | \"loud_bright\",\n' +
+        '  \"combination_type\": \"analogous\" | \"triadic\" | \"monochromatic\" | \"complementary\" | \"dynamic\" | \"monocolor\",\n' +
+        '  \"colours\": [\n' +
+        "    {\n" +
+        '      \"name\": string,            // short poetic label\n' +
+        '      \"hex\": string,             // hex code like \"#RRGGBB\"\n' +
+        '      \"role\": string,            // e.g. \"background / surface\", \"primary text anchor\", \"brand mid-tone\", \"accent / CTA\", \"supporting neutral\", etc.\n' +
+        '      \"usage_weight\": number     // integer percentage; all weights must sum to 100\n' +
+        "    },\n" +
+        "    ... " +
+        colorCount +
+        " items total\n" +
+        "  ],\n" +
+        '  \"hierarchy_notes\": string,     // how to understand background vs text vs action\n' +
+        '  \"role_summary\": string,        // 1–2 sentences describing the roles across the system\n' +
+        '  \"contrast_notes\": string       // how contrast is being handled for accessibility and hierarchy\n' +
+        "}\n\n" +
+        "Constraints:\n" +
+        "- Only include valid JSON. Do NOT wrap it in backticks. Do NOT add markdown formatting. Do NOT add any commentary.\n" +
+        "- The `colours` array length MUST equal " +
+        colorCount +
+        ".\n" +
+        "- The sum of all `usage_weight` values MUST be exactly 100.\n" +
+        "- All hex values must be realistic UI colours (avoid pure black/white unless they serve a clear role)."
+      );
+    }
+
+    // ----- Palette rendering -----
+    function applyPaletteToUI(palette) {
+      const {
+        palette_name,
+        palette_description,
+        brand_territory,
+        style_bias,
+        combination_type,
+        colours,
+        hierarchy_notes,
+        role_summary,
+        contrast_notes
+      } = palette;
+
+      $("#palette-title").textContent = palette_name || "Generated palette";
+      $("#palette-description").textContent =
+        palette_description ||
+        "A system‑ready palette derived from your brand inputs.";
+
+      const badges = $("#output-badges");
+      badges.innerHTML = "";
+      const styleBadge = document.createElement("span");
+      styleBadge.className = "badge";
+      styleBadge.textContent =
+        style_bias === "loud_bright" ? "Loud & Bright" : "Soft & Muted";
+      badges.appendChild(styleBadge);
+
+      const comboBadge = document.createElement("span");
+      comboBadge.className = "badge";
+      comboBadge.textContent = (combination_type || "Analogous") + " harmony";
+      badges.appendChild(comboBadge);
+
+      $("#territory-text").textContent = brand_territory || "";
+
+      renderSwatches(colours || []);
+      renderUsage(colours || []);
+      renderPreview(colours || [], {
+        hierarchy_notes,
+        role_summary,
+        contrast_notes
+      });
+
+      $("#results-container").style.display = "";
+      $("#results-container").dataset.hasResult = "true";
+      $("#empty-state").style.display = "none";
+    }
+
+    function renderSwatches(colours) {
+      const row = $("#swatch-row");
+      row.innerHTML = "";
+      if (!colours || !colours.length) return;
+
+      colours.forEach((colour, index) => {
+        const card = document.createElement("div");
+        card.className = "swatch-card";
+        card.style.animationDelay = 40 * index + "ms";
+
+        const rect = document.createElement("div");
+        rect.className = "swatch-rect";
+        rect.style.background = colour.hex || "#cccccc";
+
+        const meta = document.createElement("div");
+        meta.className = "swatch-meta";
+
+        const name = document.createElement("div");
+        name.className = "swatch-name";
+        name.textContent = colour.name || "Unnamed";
+
+        const hexRole = document.createElement("div");
+        hexRole.className = "swatch-hex-role";
+
+        const hex = document.createElement("span");
+        hex.textContent = colour.hex || "#000000";
+
+        const roleTag = document.createElement("span");
+        roleTag.className = "swatch-tag";
+        roleTag.textContent = (colour.role || "brand colour").toUpperCase();
+
+        hexRole.appendChild(hex);
+        hexRole.appendChild(roleTag);
+
+        meta.appendChild(name);
+        meta.appendChild(hexRole);
+
+        card.appendChild(rect);
+        card.appendChild(meta);
+
+        card.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(colour.hex || "");
+            showToast("You can now paste " + (colour.hex || "") + " into your design system.");
+          } catch (e) {
+            showToast("Copy failed. You can still select and copy the hex manually.");
+          }
+        });
+
+        row.appendChild(card);
+      });
+    }
+
+    function renderUsage(colours) {
+      const strip = $("#usage-strip");
+      const legend = $("#usage-legend");
+      strip.innerHTML = "";
+      legend.innerHTML = "";
+      if (!colours || !colours.length) return;
+
+      const totalWeight = colours.reduce(
+        (sum, c) => sum + (typeof c.usage_weight === "number" ? c.usage_weight : 0),
+        0
+      );
+      const normalised = totalWeight === 100 ? colours : colours.map((c) => c);
+
+      normalised.forEach((colour) => {
+        const weight =
+          typeof colour.usage_weight === "number" && colour.usage_weight > 0
+            ? colour.usage_weight
+            : Math.round(100 / normalised.length);
+
+        const seg = document.createElement("div");
+        seg.className = "usage-segment";
+        seg.style.flex = String(weight);
+        seg.style.background = colour.hex || "#cccccc";
+        strip.appendChild(seg);
+
+        const legendItem = document.createElement("div");
+        legendItem.className = "usage-chip";
+
+        const dot = document.createElement("span");
+        dot.className = "usage-dot";
+        dot.style.background = colour.hex || "#cccccc";
+
+        const text = document.createElement("span");
+        text.textContent =
+          (colour.role || "colour") + " — " + weight.toString() + "%";
+
+        legendItem.appendChild(dot);
+        legendItem.appendChild(text);
+        legend.appendChild(legendItem);
+      });
+    }
+
+    function findColourByRole(colours, roleHints) {
+      const lowerHints = roleHints.map((h) => h.toLowerCase());
+      for (const c of colours) {
+        const roleText = (c.role || "").toLowerCase();
+        if (lowerHints.some((h) => roleText.includes(h))) {
+          return c;
+        }
+      }
+      return null;
+    }
+
+    function renderPreview(colours, meta) {
+      const bgEl = $("#preview-background");
+      const lineStrong = $("#preview-line-strong");
+      const lineSubtle1 = $("#preview-line-subtle-1");
+      const lineSubtle2 = $("#preview-line-subtle-2");
+      const avatars = $("#preview-avatars");
+      const btn = $("#preview-button");
+      const pill = $("#preview-pill");
+      const metaHierarchy = $("#meta-hierarchy");
+      const metaRoles = $("#meta-roles");
+      const metaContrast = $("#meta-contrast");
+
+      const background =
+        findColourByRole(colours, ["background", "surface", "light neutral"]) ||
+        colours[0] ||
+        { hex: "#f9fafb" };
+      const textAnchor =
+        findColourByRole(colours, ["text", "anchor", "headline"]) ||
+        colours.find((c) => c.role && c.role.toLowerCase().includes("dark")) ||
+        colours[1] ||
+        { hex: "#111827" };
+      const accent =
+        findColourByRole(colours, ["accent", "cta", "primary action"]) ||
+        colours[colours.length - 1] ||
+        { hex: "#348bfd" };
+      const support =
+        findColourByRole(colours, ["support", "secondary", "mid-tone"]) ||
+        colours[2] ||
+        colours[0];
+
+      bgEl.style.background = background.hex || "#ffffff";
+      bgEl.style.color = textAnchor.hex || "#111827";
+
+      lineStrong.style.background = textAnchor.hex || "#111827";
+      lineSubtle1.style.background = support ? support.hex : textAnchor.hex;
+      lineSubtle2.style.background = support ? lighten(support.hex, 10) : lighten(textAnchor.hex, 15);
+
+      btn.style.background = accent.hex || "#348bfd";
+      btn.style.color = getContrastingTextColor(accent.hex || "#348bfd");
+      pill.style.borderColor = textAnchor.hex || "#111827";
+      pill.style.color = textAnchor.hex || "#111827";
+
+      avatars.innerHTML = "";
+      [accent, support, textAnchor].forEach((c) => {
+        const a = document.createElement("div");
+        a.className = "preview-avatar";
+        a.style.background = c.hex || "#ddd";
+        avatars.appendChild(a);
+      });
+
+      metaHierarchy.textContent = meta.hierarchy_notes || "Anchor, neutral background, brand mid-tones, and accent are clearly separated by value and saturation.";
+      metaRoles.textContent = meta.role_summary || "Each colour has a specific job across background, text, accent, and supporting roles.";
+      metaContrast.textContent = meta.contrast_notes || "Key text and CTA colours maintain sufficient contrast against their backgrounds for comfortable reading.";
+    }
+
+    // Simple hex helpers for preview tweaks
+    function hexToRgb(hex) {
+      if (!hex || typeof hex !== "string") return null;
+      const cleaned = hex.replace("#", "");
+      if (cleaned.length !== 6) return null;
+      const num = parseInt(cleaned, 16);
+      return {
+        r: (num >> 16) & 255,
+        g: (num >> 8) & 255,
+        b: num & 255
+      };
+    }
+
+    function rgbToHex(r, g, b) {
+      const toHex = (v) => {
+        const h = v.toString(16);
+        return h.length === 1 ? "0" + h : h;
+      };
+      return "#" + toHex(r) + toHex(g) + toHex(b);
+    }
+
+    function lighten(hex, amount) {
+      const rgb = hexToRgb(hex);
+      if (!rgb) return hex;
+      const factor = amount / 100;
+      const r = Math.round(rgb.r + (255 - rgb.r) * factor);
+      const g = Math.round(rgb.g + (255 - rgb.g) * factor);
+      const b = Math.round(rgb.b + (255 - rgb.b) * factor);
+      return rgbToHex(r, g, b);
+    }
+
+    function darken(hex, amount) {
+      const rgb = hexToRgb(hex);
+      if (!rgb) return hex;
+      const factor = 1 - amount / 100;
+      const r = Math.round(rgb.r * factor);
+      const g = Math.round(rgb.g * factor);
+      const b = Math.round(rgb.b * factor);
+      return rgbToHex(r, g, b);
+    }
+
+    function getContrastingTextColor(hex) {
+      const rgb = hexToRgb(hex);
+      if (!rgb) return "#111827";
+      const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+      return luminance > 0.6 ? "#111827" : "#f9fafb";
+    }
+
+    // ----- Gathering inputs and triggering generation -----
+    async function handleGenerateClick() {
+      clearError();
+      const attributes = readChipValues($("[data-chip-input][data-max='3']"));
+      const audience = readChipValues($("[data-chip-input][data-max='5']"));
+      const personality = $("#personality").value.trim();
+      const positioning = $("#positioning").value.trim();
+      const story = $("#story").value.trim();
+      const styleBias = getSelectedStyle();
+      const comboType = getSelectedCombo();
+      const colorCount = getSelectedCount();
+
+      const payload = {
+        attributes,
+        audience,
+        personality,
+        positioning,
+        story,
+        styleBias,
+        comboType,
+        colorCount
+      };
+
+      setLoading(true);
+
+      try {
+        const palette = await callAnthropic(payload);
+        applyPaletteToUI(palette);
+      } catch (err) {
+        console.error(err);
+        showError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function setupGenerateButton() {
+      const btn = $("#generate-btn");
+      if (!btn) return;
+      btn.addEventListener("click", () => {
+        handleGenerateClick();
+      });
+    }
+
+    function setupCmdEnterShortcuts() {
+      $all("textarea").forEach((ta) => {
+        ta.addEventListener("keydown", (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+            e.preventDefault();
+            handleGenerateClick();
+          }
+        });
+      });
+    }
+
+    // ----- Init -----
+    document.addEventListener("DOMContentLoaded", () => {
+      setupAccordions();
+      setupChipInputs();
+      setupStyleToggle();
+      setupComboGrid();
+      setupCountButtons();
+      setupGenerateButton();
+      setupCmdEnterShortcuts();
+    });
+  </script>
+</body>
+</html>
