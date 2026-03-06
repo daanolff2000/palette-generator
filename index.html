@@ -1592,13 +1592,11 @@
         ]
       };
 
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Anthropic-Version": "2023-06-01"
-          // NOTE: Authentication is handled externally; no API key is included here.
+          "Accept": "application/json"
         },
         body: JSON.stringify(body)
       });
