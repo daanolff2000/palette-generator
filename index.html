@@ -97,14 +97,6 @@
       color: var(--text-soft);
     }
 
-    .topbar-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      margin-right: var(--space-2);
-    }
-
     /* Layout */
     .app-shell {
       display: flex;
@@ -461,9 +453,10 @@
     /* Generate button */
     .generate-button {
       width: 100%;
+      height: 44px;
       border-radius: var(--radius-pill);
       border: none;
-      padding: 10px 14px;
+      padding: 0 14px;
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.08em;
@@ -1006,7 +999,6 @@
 <body>
   <!-- Top bar -->
   <div class="topbar">
-    <div class="topbar-dot"></div>
   </div>
 
   <div class="app-shell">
@@ -1188,11 +1180,7 @@
 
       <!-- Sidebar footer -->
       <div class="sidebar-footer">
-        <button id="generate-btn" class="generate-button" type="button">
-          <span>Generate palette</span>
-          <span class="generate-icon">→</span>
-          <span class="generate-shortcut">⌘⏎ from any textarea</span>
-        </button>
+        <button id="generate-btn" class="generate-button" type="button">Generate palette</button>
       </div>
     </aside>
 
