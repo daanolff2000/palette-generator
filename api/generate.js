@@ -25,14 +25,36 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  let body;
+  let incoming;
   try {
-    body = req.body && typeof req.body === "object" ? req.body : await getRequestBody(req);
+    incoming = req.body && typeof req.body === "object" ? req.body : await getRequestBody(req);
   } catch (err) {
     res.statusCode = 400;
     res.end(JSON.stringify({ error: "Invalid JSON body." }));
     return;
   }
+
+  // Normalise body to the expected Anthropic shape:
+  // { model, max_tokens, messages: [{ role: "user", content: "..." }] }
+  const userContent =
+    (incoming &&
+      Array.isArray(incoming.messages) &&
+      incoming.messages[0] &&
+      incoming.messages[0].content) ||
+    incoming.content ||
+    incoming.prompt ||
+    "";
+
+  const body = {
+    model: "claude-sonnet-4-20250514",
+    max_tokens: typeof incoming.max_tokens === "number" ? incoming.max_tokens : 1000,
+    messages: [
+      {
+        role: "user",
+        content: userContent
+      }
+    ]
+  };
 
   try {
     const upstream = await fetch(ANTHROPIC_URL, {
@@ -47,6 +69,10 @@ module.exports = async function handler(req, res) {
     });
 
     const text = await upstream.text();
+    if (!upstream.ok) {
+      // Log full error response from Anthropic for debugging
+      console.error("Anthropic API error:", upstream.status, text);
+    }
     res.statusCode = upstream.status;
     res.setHeader("Content-Type", "application/json");
     res.end(text);
