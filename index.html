@@ -1698,21 +1698,23 @@
 
     // ----- Palette rendering -----
     function applyPaletteToUI(palette) {
+      // Map API fields to internal camelCase names while supporting both variants.
+      const paletteName = palette.paletteName || palette.palette_name;
+      const paletteDescription = palette.paletteDescription || palette.palette_description;
+      const brandTerritory = palette.brandTerritory || palette.brand_territory;
+      const colours = palette.colours || palette.colors || [];
+
       const {
-        palette_name,
-        palette_description,
-        brand_territory,
         style_bias,
         combination_type,
-        colours,
         hierarchy_notes,
         role_summary,
         contrast_notes
       } = palette;
 
-      $("#palette-title").textContent = palette_name || "Generated palette";
+      $("#palette-title").textContent = paletteName || "Generated palette";
       $("#palette-description").textContent =
-        palette_description ||
+        paletteDescription ||
         "A system‑ready palette derived from your brand inputs.";
 
       const badges = $("#output-badges");
@@ -1728,7 +1730,7 @@
       comboBadge.textContent = (combination_type || "Analogous") + " harmony";
       badges.appendChild(comboBadge);
 
-      $("#territory-text").textContent = brand_territory || "";
+      $("#territory-text").textContent = brandTerritory || "";
 
       renderSwatches(colours || []);
       renderUsage(colours || []);
