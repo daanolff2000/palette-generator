@@ -69,13 +69,33 @@ module.exports = async function handler(req, res) {
     });
 
     const text = await upstream.text();
-    if (!upstream.ok) {
-      // Log full error response from Anthropic for debugging
-      console.error("Anthropic API error:", upstream.status, text);
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+      console.log(JSON.stringify(parsed, null, 2));
+
+      if (!upstream.ok) {
+        console.error("Anthropic API error:", upstream.status, parsed);
+        res.statusCode = upstream.status;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(parsed));
+        return;
+      }
+
+      res.statusCode = upstream.status;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify(parsed));
+    } catch (error) {
+      console.error("Error handling Anthropic response:", error);
+      res.statusCode = upstream.status || 500;
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          error: "Failed to handle Anthropic response.",
+          data: parsed
+        })
+      );
     }
-    res.statusCode = upstream.status;
-    res.setHeader("Content-Type", "application/json");
-    res.end(text);
   } catch (error) {
     res.statusCode = 502;
     res.setHeader("Content-Type", "application/json");
