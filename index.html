@@ -503,34 +503,41 @@
     .empty-state {
       width: 100%;
       margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .empty-swatches {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .empty-swatch {
+      width: 80px;
+      border-radius: 22px;
+      background: #f0f0f0;
+    }
+
+    .empty-swatch.tall {
+      height: 140px;
+    }
+
+    .empty-swatch.short {
+      height: 90px;
+      align-self: flex-end;
+    }
+
+    .empty-caption {
+      max-width: 520px;
+      text-align: center;
       font-size: 13px;
-      color: var(--text-soft);
-      background: #ffffff;
-      border-radius: var(--radius-xl);
-      border: 1px dashed #e0e0e8;
-      padding: 18px 18px 18px 16px;
-      display: inline-flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .empty-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-top: 4px;
-      background: #348bfd;
-      box-shadow: 0 8px 18px rgba(15, 106, 223, 0.35);
-    }
-
-    .empty-text-strong {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-main);
-    }
-
-    .empty-text-muted {
-      margin-top: 6px;
+      color: #9ca3af;
+      line-height: 1.5;
     }
 
     .output-header {
@@ -607,17 +614,14 @@
     /* Swatches */
     .swatch-row {
       display: flex;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       gap: 18px;
-      overflow-x: auto;
       padding-bottom: var(--space-3);
       margin-bottom: var(--space-5);
-      scroll-snap-type: x mandatory;
     }
 
     .swatch-card {
-      scroll-snap-align: start;
-      min-width: 120px;
+      width: 110px;
       display: flex;
       flex-direction: column;
       align-items: stretch;
@@ -678,7 +682,7 @@
       border-radius: 999px;
       overflow: hidden;
       display: flex;
-      height: 18px;
+      height: 40px;
       border: 1px solid #d1d5db;
       box-shadow: 0 8px 20px rgba(15, 23, 42, 0.20);
       margin-bottom: var(--space-1);
@@ -1209,12 +1213,15 @@
 
         <!-- Initial empty state -->
         <div id="empty-state" class="empty-state">
-          <div class="empty-dot"></div>
-          <div>
-            <div class="empty-text-strong">Working palettes start with clear intent.</div>
-            <div class="empty-text-muted">
-              Add a few attributes, who this is for, and whether you want a soft or loud system. I’ll generate a hierarchy with anchors, neutrals, brand colours, and accents.
-            </div>
+          <div class="empty-swatches">
+            <div class="empty-swatch tall"></div>
+            <div class="empty-swatch short"></div>
+            <div class="empty-swatch tall"></div>
+            <div class="empty-swatch short"></div>
+            <div class="empty-swatch tall"></div>
+          </div>
+          <div class="empty-caption">
+            Fill in your brand strategy and visual direction to generate a considered colour palette.
           </div>
         </div>
 
@@ -1289,21 +1296,6 @@
                   </div>
                 </div>
               </article>
-
-              <aside class="preview-metadata" id="preview-meta">
-                <div class="preview-metadata-row">
-                  <div class="preview-metadata-label">Hierarchy</div>
-                  <div id="meta-hierarchy"></div>
-                </div>
-                <div class="preview-metadata-row">
-                  <div class="preview-metadata-label">Roles</div>
-                  <div id="meta-roles"></div>
-                </div>
-                <div class="preview-metadata-row">
-                  <div class="preview-metadata-label">Contrast</div>
-                  <div id="meta-contrast"></div>
-                </div>
-              </aside>
             </div>
           </section>
         </div>
@@ -1859,9 +1851,6 @@
       const avatars = $("#preview-avatars");
       const btn = $("#preview-button");
       const pill = $("#preview-pill");
-      const metaHierarchy = $("#meta-hierarchy");
-      const metaRoles = $("#meta-roles");
-      const metaContrast = $("#meta-contrast");
 
       const background =
         findColourByRole(colours, ["background", "surface", "light neutral"]) ||
@@ -1902,9 +1891,6 @@
         avatars.appendChild(a);
       });
 
-      metaHierarchy.textContent = meta.hierarchy_notes || "Anchor, neutral background, brand mid-tones, and accent are clearly separated by value and saturation.";
-      metaRoles.textContent = meta.role_summary || "Each colour has a specific job across background, text, accent, and supporting roles.";
-      metaContrast.textContent = meta.contrast_notes || "Key text and CTA colours maintain sufficient contrast against their backgrounds for comfortable reading.";
     }
 
     // Simple hex helpers for preview tweaks
