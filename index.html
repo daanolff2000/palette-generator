@@ -1885,8 +1885,9 @@
       bgEl.style.color = textAnchor.hex || "#111827";
 
       lineStrong.style.background = textAnchor.hex || "#111827";
-      lineSubtle1.style.background = support ? support.hex : textAnchor.hex;
-      lineSubtle2.style.background = support ? lighten(support.hex, 10) : lighten(textAnchor.hex, 15);
+      const safeSupport = support || textAnchor;
+      lineSubtle1.style.background = safeSupport ? safeSupport.hex : textAnchor.hex;
+      lineSubtle2.style.background = safeSupport ? lighten(safeSupport.hex, 10) : lighten(textAnchor.hex, 15);
 
       btn.style.background = accent.hex || "#348bfd";
       btn.style.color = getContrastingTextColor(accent.hex || "#348bfd");
@@ -1894,7 +1895,7 @@
       pill.style.color = textAnchor.hex || "#111827";
 
       avatars.innerHTML = "";
-      [accent, support, textAnchor].forEach((c) => {
+      [accent, support, textAnchor].filter(Boolean).forEach((c) => {
         const a = document.createElement("div");
         a.className = "preview-avatar";
         a.style.background = c.hex || "#ddd";
