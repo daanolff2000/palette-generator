@@ -1593,21 +1593,19 @@
       }
 
       const data = await response.json();
-      const textContent =
-        data &&
-        Array.isArray(data.content) &&
-        data.content.length > 0 &&
-        data.content[0].type === "text"
-          ? data.content[0].text
-          : null;
+      const rawText =
+        data && Array.isArray(data.content)
+          ? data.content.map((i) => i.text || "").join("")
+          : "";
 
-      if (!textContent) {
+      if (!rawText) {
         throw new Error("Unexpected response structure from Anthropic.");
       }
 
       let json;
       try {
-        json = JSON.parse(textContent);
+        const clean = rawText.replace(/```json|```/g, "").trim();
+        json = JSON.parse(clean);
       } catch (err) {
         throw new Error("Failed to parse JSON from Anthropic. Ensure the assistant returns pure JSON.");
       }
